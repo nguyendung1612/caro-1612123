@@ -26,22 +26,22 @@ class SquareRow extends React.Component {
             let rowIdx = this.props.rowIdx;
             if (winner) {
                 // TH win hang ngang
-                if (winner.direction === "ToRight" &&
+                if (winner.direction === "Ngang" &&
                     idx >= winner.x && idx <= winner.x + nSquareToWin - 1 && rowIdx === winner.y) {
                     win = true;
                 }
                 // TH win hang doc
-                if (winner.direction === "ToDown" &&
+                if (winner.direction === "Doc" &&
                     rowIdx >= winner.y && rowIdx <= winner.y + nSquareToWin - 1 && idx === winner.x) {
                     win = true;
                 }
                 // TH win cheo phai
-                if (winner.direction === "ToRightDown" &&
+                if (winner.direction === "CheoPhai" &&
                     idx >= winner.x && idx <= winner.x + nSquareToWin - 1 && idx - winner.x === rowIdx - winner.y) {
                     win = true;
                 }
                 // TH win cheo trai
-                if (winner.direction === "ToLeftDown" &&
+                if (winner.direction === "CheoTrai" &&
                     idx <= winner.x && idx >= winner.x - nSquareToWin + 1 && winner.x - idx === rowIdx - winner.y) {
                     win = true;
                 }

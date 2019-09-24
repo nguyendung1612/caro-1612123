@@ -54,7 +54,7 @@ function calculateWinner(squares, m, n) {
                     break;
                 }
             }
-            if (win) return { val: squares[i][j], x: j, y: i, direction: 'ToRight' };
+            if (win) return { val: squares[i][j], x: j, y: i, direction: 'Ngang' };
 
             //TH1: chan 2 dau doc
             win = true;
@@ -65,7 +65,7 @@ function calculateWinner(squares, m, n) {
                     break;
                 }
             }
-            if (win) return { val: squares[i][j], x: j, y: i, direction: 'ToDown' };
+            if (win) return { val: squares[i][j], x: j, y: i, direction: 'Doc' };
 
             //TH1: chan 2 dau cheo phai
             win = true;
@@ -76,7 +76,7 @@ function calculateWinner(squares, m, n) {
                     break;
                 }
             }
-            if (win) return { val: squares[i][j], x: j, y: i, direction: 'ToRightDown' };
+            if (win) return { val: squares[i][j], x: j, y: i, direction: 'CheoPhai' };
 
             //TH1: chan 2 dau cheo trai 
             win = true;
@@ -87,7 +87,7 @@ function calculateWinner(squares, m, n) {
                     break;
                 }
             }
-            if (win) return { val: squares[i][j], x: j, y: i, direction: 'ToLeftDown' };
+            if (win) return { val: squares[i][j], x: j, y: i, direction: 'CheoTrai' };
 
         }
     }
