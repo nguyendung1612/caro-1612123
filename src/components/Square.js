@@ -13,10 +13,9 @@ function Square(props) {
                 {props.value}
             </button>
         );
-
 }
 
-//Quan ly tung o trong 1 hang
+// Quan ly tung o trong 1 hang
 class SquareRow extends React.Component {
     render() {
         let squareRow = this.props.row.map((square, idx) => {
