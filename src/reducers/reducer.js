@@ -1,14 +1,10 @@
-import { combineReducers } from 'react-redux';
+import { combineReducers } from 'redux';
 import history from './history';
-import isStateReducer from './isState';
+import status from './isState';
 
 const reducer = combineReducers({
   history,
-  stepNumber: isStateReducer,
-  idX: isStateReducer,
-  idY: isStateReducer,
-  isNext: isStateReducer,
-  isReverse: isStateReducer
+  status
 });
 
 export default reducer;

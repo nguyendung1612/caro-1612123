@@ -9,11 +9,23 @@ const defaultState = {
 const isStateReducer = (state = defaultState, action) => {
   switch (action.type) {
     case 'REVERSE':
-      return { isReverse: !state.isReverse };
+      return { ...state, isReverse: !state.isReverse };
     case 'JUMP_TO':
-      return { stepNumber: action.move, isNext: action.move % 2 === 0 };
+      return {
+        ...state,
+        stepNumber: action.move,
+        isNext: action.move % 2 === 0
+      };
     case 'RESET_IS_STATE':
-      return state;
+      return defaultState;
+    case 'CLICK_SQUARE_STATE':
+      return {
+        ...state,
+        isNext: !state.isNext,
+        stepNumber: state.stepNumber + 1,
+        idX: action.X,
+        idY: action.Y
+      };
     default:
       return state;
   }

@@ -1,3 +1,4 @@
+import { connect } from 'react-redux';
 import React from 'react';
 import '../index.css';
 import Board from './Board';
@@ -139,44 +140,26 @@ function calculateWinner(squares, m, n) {
 
 // Quan ly game
 class Game extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      history: [
-        {
-          squares: Array(20)
-            .fill(null)
-            .map(() => Array(20).fill(null)),
-          location: '',
-          isWin: null,
-          id: 0
-        }
-      ],
-      stepNumber: 0,
-      idX: -1,
-      idY: -1,
-      isNext: true,
-      isReverse: false
-    }; // khoi tao state la matrix voi kich thuoc 20*20
-  }
-
   handleReverse = () => {
-    this.setState(prevState => ({
-      isReverse: !prevState.isReverse
-    }));
+    const { dispatch } = this.props;
+    dispatch({ type: 'REVERSE' });
   };
 
   jumpTo = move => {
-    this.setState({
-      stepNumber: move,
-      isNext: move % 2 === 0
-    });
+    const { dispatch } = this.props;
+    dispatch({ type: 'JUMP_TO', move });
+  };
+
+  handleReset = () => {
+    const { dispatch } = this.props;
+    dispatch({ type: 'RESET_HIS' });
+    dispatch({ type: 'RESET_IS_STATE' });
   };
 
   handleClick = (i, j) => {
     // Chúng ta cần clone history ra bản phụ tránh làm ảnh hưởng bản chính
-    const { state } = this;
-    const hisNow = state.history.slice(0, state.stepNumber + 1);
+    const { history, status } = this.props;
+    const hisNow = history.slice(0, status.stepNumber + 1);
     // Lấy history của lần gần nhất
     const current = hisNow[hisNow.length - 1];
     const squaresNow = current.squares.slice();
@@ -190,70 +173,48 @@ class Game extends React.Component {
     if (current.isWin || squaresNow[i][j]) {
       return; // neu da co gia tri thi ko thay doi
     }
-    squaresNow[i][j] = state.isNext ? 'X' : 'O';
+    squaresNow[i][j] = status.isNext ? 'X' : 'O';
     let tmp = false;
     if (calculateWinner(squaresNow, i, j)) {
       tmp = true;
     }
 
-    this.setState(prevState => ({
-      history: hisNow.concat([
-        {
-          squares: squaresNow,
-          location: `${i},${j}`,
-          isWin: tmp,
-          id: state.stepNumber + 1
-        }
-      ]),
-      isNext: !prevState.isNext,
-      stepNumber: state.stepNumber + 1,
-      idX: i,
-      idY: j
-    }));
-  };
+    const item = {
+      squares: squaresNow,
+      location: `${i},${j}`,
+      isWin: tmp,
+      id: status.stepNumber + 1
+    };
 
-  handleReset = () => {
-    this.setState({
-      history: [
-        {
-          squares: Array(20)
-            .fill(null)
-            .map(() => Array(20).fill(null)),
-          location: '',
-          isWin: false,
-          id: 0
-        }
-      ],
-      isNext: true,
-      stepNumber: 0,
-      idX: -1,
-      idY: -1
-    });
+    const { stepNumber } = status;
+
+    const { dispatch } = this.props;
+    dispatch({ type: 'CLICK_SQUARE_HIS', stepNumber, item });
+    dispatch({ type: 'CLICK_SQUARE_STATE', X: i, Y: j });
   };
 
   render() {
     // chi dung de view nen ko can clone ra ban nhap
-    const { state } = this;
-    const { history } = state;
-    const current = history[state.stepNumber];
+    const { history, status } = this.props;
+    const current = history[status.stepNumber];
     const { squares } = current;
-    const winner = calculateWinner(squares, state.idX, state.idY);
-    let status;
+    const winner = calculateWinner(squares, status.idX, status.idY);
+    let isWin;
 
     if (winner) {
-      status = `Winner is: ${winner.val}`; // Nếu winner có giá trị thì sẽ hiển thị người thắng cuộc
-    } else if (state.stepNumber === 20 * 20) {
+      isWin = `Winner is: ${winner.val}`; // Nếu winner có giá trị thì sẽ hiển thị người thắng cuộc
+    } else if (status.stepNumber === 20 * 20) {
       // Nếu sau 9 lần chưa có ai win thì hòa
-      status = 'No one win';
+      isWin = 'No one win';
     } else {
-      status = `Next player is: ${state.isNext ? 'X' : 'O'}`;
+      isWin = `Next player is: ${status.isNext ? 'X' : 'O'}`;
     }
 
     const moves = history.map(step => {
       const { id } = step;
       if (id !== 0) {
         const descr = `Move ${id}: (${step.location})`;
-        return state.stepNumber === id ? (
+        return status.stepNumber === id ? (
           <li key={id}>
             <button type="button" onClick={() => this.jumpTo(id)}>
               <b>{descr}</b>
@@ -270,7 +231,7 @@ class Game extends React.Component {
       return null;
     });
 
-    const arrow = state.isReverse ? '↓' : '↑';
+    const arrow = status.isReverse ? '↓' : '↑';
 
     return (
       <div className="game">
@@ -285,7 +246,7 @@ class Game extends React.Component {
           <div>
             <b>INFORMATION</b>
           </div>
-          <p>{status}</p>
+          <p>{isWin}</p>
           <button
             type="button"
             className="btn"
@@ -293,7 +254,7 @@ class Game extends React.Component {
           >
             Sort {arrow}
           </button>
-          <ul>{state.isReverse ? moves.reverse() : moves}</ul>
+          <ul>{status.isReverse ? moves.reverse() : moves}</ul>
           <button
             type="button"
             className="btn"
@@ -308,4 +269,9 @@ class Game extends React.Component {
   }
 }
 
-export default Game;
+export default connect(state => {
+  return {
+    history: state.history,
+    status: state.status
+  };
+})(Game);

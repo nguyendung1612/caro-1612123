@@ -11,10 +11,10 @@ const defaultHis = [
 
 const historyReducer = (state = defaultHis, action) => {
   switch (action.type) {
-    case 'CLICK_SQUARE':
-      return { ...state.concat(action.item) };
+    case 'CLICK_SQUARE_HIS':
+      return [...state.slice(0, action.stepNumber + 1).concat(action.item)];
     case 'RESET_HIS':
-      return state;
+      return defaultHis;
     default:
       return state;
   }
