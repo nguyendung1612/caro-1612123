@@ -1,7 +1,10 @@
+import { connect } from 'react-redux';
 import React from 'react';
+import action from '../action/action';
 import '../index.css';
 
 const nSquareToWin = 5;
+
 const Square = props => {
   const rs = props;
   return (
@@ -25,6 +28,43 @@ const Square = props => {
 
 // Quan ly tung o trong 1 hang
 class SquareRow extends React.PureComponent {
+  handleClick = (i, j) => {
+    // Chúng ta cần clone history ra bản phụ tránh làm ảnh hưởng bản chính
+    const { history, status } = this.props;
+    const hisNow = history.slice(0, status.stepNumber + 1);
+    // Lấy history của lần gần nhất
+    const current = hisNow[hisNow.length - 1];
+    const squaresNow = current.squares.slice();
+
+    // clone moi dong
+    current.squares.map((row, idx) => {
+      squaresNow[idx] = current.squares[idx].slice();
+      return true;
+    });
+
+    if (current.isWin || squaresNow[i][j]) {
+      return; // neu da co gia tri thi ko thay doi
+    }
+    squaresNow[i][j] = status.isNext ? 'X' : 'O';
+    let tmp = false;
+    if (action.calculateWinner(squaresNow, i, j)) {
+      tmp = true;
+    }
+
+    const item = {
+      squares: squaresNow,
+      location: `${i},${j}`,
+      isWin: tmp,
+      id: status.stepNumber + 1
+    };
+
+    const { stepNumber } = status;
+
+    const { dispatch } = this.props;
+    dispatch(action.clickHis(stepNumber, item));
+    dispatch(action.clickIsState(i, j));
+  };
+
   render() {
     const { props } = this;
     const squareRow = props.row.map((square, idx) => {
@@ -74,7 +114,7 @@ class SquareRow extends React.PureComponent {
         <Square
           win={win}
           value={square}
-          onClick={() => props.onClick(props.rowIdx, idx)}
+          onClick={() => this.handleClick(props.rowIdx, idx)}
           key={k}
         />
       );
@@ -83,4 +123,10 @@ class SquareRow extends React.PureComponent {
     return <div className="board-row">{squareRow}</div>;
   }
 }
-export default SquareRow;
+
+export default connect(state => {
+  return {
+    history: state.history,
+    status: state.status
+  };
+})(SquareRow);
