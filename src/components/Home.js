@@ -1,10 +1,12 @@
 import React from 'react';
+import Nav from './Nav';
+import Game from './Game';
 
 class Home extends React.PureComponent {
   render() {
     return (
-      <div>
-        <h1>Home page</h1>
+      <div className="App container">
+        <Nav />
       </div>
     );
   }

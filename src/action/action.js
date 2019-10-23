@@ -1,3 +1,7 @@
+import { isNull } from 'util';
+import Types from '../constants/ActionTypes';
+import apiCaller from '../utils/apiCaller';
+
 const nSquareToWin = 5;
 
 function calculateWinner(squares, m, n) {
@@ -152,9 +156,57 @@ function clickHis(stepNumber, item) {
   return { type: 'CLICK_SQUARE_HIS', stepNumber, item };
 }
 
+const signOut = () => async dispatch => {
+  const rs = await apiCaller.signOut();
+  if (!isNull(rs)) {
+    dispatch({ type: Types.SIGN_OUT });
+  }
+};
+
 function resetHis() {
   return { type: 'RESET_HIS' };
 }
+
+function emitLogin() {
+  return { type: Types.SIGN_IN, payload: true };
+}
+
+const signIn = (username, password) => async dispatch => {
+  const rs = await apiCaller.signIn(username, password);
+  if (!isNull(rs)) {
+    const { token } = rs;
+    window.localStorage.setItem('token', token);
+    dispatch(emitLogin());
+  }
+};
+
+function emitSignUp() {
+  return { type: Types.SIGN_UP, payload: false };
+}
+
+const signUp = (name, username, password) => async dispatch => {
+  const rs = await apiCaller.signUp(name, username, password);
+  if (!isNull(rs)) {
+    dispatch(emitSignUp());
+  }
+};
+
+const getUser = () => async dispatch => {
+  const rs = await apiCaller.getUser();
+  if (!isNull(rs)) {
+    dispatch({ type: Types.GET_USER });
+  }
+  console.log(rs);
+  return rs;
+};
+
+const checkLogin = () => async dispatch => {
+  const rs = await apiCaller.checkLogin();
+  if (!isNull(rs)) {
+    dispatch({ type: Types.GET_USER });
+  }
+  return rs;
+};
 
 const action = {
   calculateWinner,
@@ -163,7 +215,12 @@ const action = {
   resetState,
   clickIsState,
   clickHis,
-  resetHis
+  resetHis,
+  signIn,
+  signOut,
+  signUp,
+  getUser,
+  checkLogin
 };
 
 export default action;

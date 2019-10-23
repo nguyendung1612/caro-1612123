@@ -1,21 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import store from './store';
-import Game from './components/Game';
 import Home from './components/Home';
 import Login from './components/Login';
 import Register from './components/Register';
+
+require('bootstrap/dist/css/bootstrap.min.css');
 
 ReactDOM.render(
   <Provider store={store}>
     <Router>
       <Switch>
-        <Route path="/register">
+        <Route path="/user/register">
           <Register />
         </Route>
-        <Route path="/login">
+        <Route path="/user/login">
           <Login />
         </Route>
         <Route path="/">
@@ -23,7 +24,6 @@ ReactDOM.render(
         </Route>
       </Switch>
     </Router>
-    {/* <Game /> */}
   </Provider>,
   document.getElementById('root')
 );
