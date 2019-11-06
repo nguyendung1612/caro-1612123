@@ -1,7 +1,10 @@
+/* eslint-disable consistent-return */
+/* eslint-disable no-nested-ternary */
 import { connect } from 'react-redux';
 import React from 'react';
 import action from '../action/action';
 import '../index.css';
+// import Square from './Square';
 
 const nSquareToWin = 5;
 
@@ -17,8 +20,12 @@ const Square = props => {
         >
           {rs.value}
         </button>
+      ) : rs.value === 'X' ? (
+        <button type="button" className="square red" onClick={rs.onClick}>
+          {rs.value}
+        </button>
       ) : (
-        <button type="button" className="square" onClick={rs.onClick}>
+        <button type="button" className="square blue" onClick={rs.onClick}>
           {rs.value}
         </button>
       )}
@@ -28,9 +35,20 @@ const Square = props => {
 
 // Quan ly tung o trong 1 hang
 class SquareRow extends React.PureComponent {
+  // componentDidUpdate() {
+  //   const { history, status } = this.props;
+  //   const hisNow = history.slice(0, status.stepNumber + 1);
+  //   // Lấy history của lần gần nhất
+  //   const current = hisNow[hisNow.length - 1];
+  //   console.log('dam dep zai');
+  //   if (!current.isWin && !status.isNext) {
+  //     this.makeAIMove();
+  //   }
+  // }
+
   handleClick = (i, j) => {
+    const { history, status, clickHis, clickIsState, sendMove } = this.props;
     // Chúng ta cần clone history ra bản phụ tránh làm ảnh hưởng bản chính
-    const { history, status } = this.props;
     const hisNow = history.slice(0, status.stepNumber + 1);
     // Lấy history của lần gần nhất
     const current = hisNow[hisNow.length - 1];
@@ -42,9 +60,10 @@ class SquareRow extends React.PureComponent {
       return true;
     });
 
-    if (current.isWin || squaresNow[i][j]) {
+    if (current.isWin || squaresNow[i][j] || !status.isNext) {
       return; // neu da co gia tri thi ko thay doi
     }
+
     squaresNow[i][j] = status.isNext ? 'X' : 'O';
     let tmp = false;
     if (action.calculateWinner(squaresNow, i, j)) {
@@ -60,9 +79,16 @@ class SquareRow extends React.PureComponent {
 
     const { stepNumber } = status;
 
-    const { dispatch } = this.props;
-    dispatch(action.clickHis(stepNumber, item));
-    dispatch(action.clickIsState(i, j));
+    const data = {
+      X: i,
+      Y: j
+      // data: squaresNow[i][j]
+    };
+
+    sendMove(data);
+
+    clickHis(stepNumber, item);
+    clickIsState(i, j);
   };
 
   render() {
@@ -114,8 +140,8 @@ class SquareRow extends React.PureComponent {
         <Square
           win={win}
           value={square}
-          onClick={() => this.handleClick(props.rowIdx, idx)}
           key={k}
+          onClick={() => this.handleClick(props.rowIdx, idx)}
         />
       );
     });
@@ -124,9 +150,19 @@ class SquareRow extends React.PureComponent {
   }
 }
 
-export default connect(state => {
+const mapStateToProps = state => {
   return {
     history: state.history,
     status: state.status
   };
-})(SquareRow);
+};
+
+const mapDispatchToProps = {
+  clickHis: action.clickHis,
+  clickIsState: action.clickIsState
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(SquareRow);

@@ -1,15 +1,21 @@
 import React from 'react';
-import Nav from './Nav';
+import { connect } from 'react-redux';
+import Login from './User/Login';
 import Game from './Game';
 
 class Home extends React.PureComponent {
   render() {
-    return (
-      <div className="App container">
-        <Nav />
-      </div>
-    );
+    const { userState } = this.props;
+    const { isLogin } = userState;
+
+    return <div>{isLogin ? <Game /> : <Login />}</div>;
   }
 }
 
-export default Home;
+const mapStateToProps = state => {
+  return {
+    userState: state.user
+  };
+};
+
+export default connect(mapStateToProps)(Home);

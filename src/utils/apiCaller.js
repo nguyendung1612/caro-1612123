@@ -1,10 +1,12 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'https://caroapi-1612123.herokuapp.com',
+  // baseURL: 'https://caroapi-1612123.herokuapp.com',
+  baseURL: 'http://localhost:4040',
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*'
   }
 });
 
@@ -76,13 +78,36 @@ export default {
     return null;
   },
 
-  checkLogin: async () => {
+  signInFB: async () => {
     try {
-      const response = await instance.get('/token');
-      if (response.data !== 'NOT_LOGGED_IN') {
-        window.localStorage.setItem('token', response.data);
-        return response.data;
-      }
+      const rs = await instance.get('/auth/fb');
+      console.log(rs.data);
+      return rs.data;
+    } catch (error) {
+      console.error(error);
+    }
+    return null;
+  },
+
+  updateLocal: async (id, name, username) => {
+    try {
+      const response = await instance.post('/user/update', {
+        id,
+        name,
+        username
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error(error);
+    }
+    return null;
+  },
+
+  upload: async (id, data, config) => {
+    try {
+      const response = await instance.post(`/user/avatar/${id}`, data, config);
+      return response.data;
     } catch (error) {
       console.error(error);
     }

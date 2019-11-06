@@ -136,39 +136,56 @@ function calculateWinner(squares, m, n) {
   return null;
 }
 
-function reverse() {
-  return { type: 'REVERSE' };
-}
+const reverse = () => async dispatch => {
+  dispatch({ type: 'REVERSE' });
+};
 
-function jumpTo(move) {
-  return { type: 'JUMP_TO', move };
-}
+const jumpTo = move => async dispatch => {
+  dispatch({ type: 'JUMP_TO', move });
+};
 
-function resetState() {
-  return { type: 'RESET_IS_STATE' };
-}
+const resetState = () => async dispatch => {
+  dispatch({ type: 'RESET_IS_STATE' });
+};
 
-function clickIsState(X, Y) {
-  return { type: 'CLICK_SQUARE_STATE', X, Y };
-}
+const resetHis = () => async dispatch => {
+  dispatch({ type: 'RESET_HIS' });
+};
 
-function clickHis(stepNumber, item) {
-  return { type: 'CLICK_SQUARE_HIS', stepNumber, item };
-}
+const clickIsState = (X, Y) => async dispatch => {
+  dispatch({ type: 'CLICK_SQUARE_STATE', X, Y });
+};
+
+const clickHis = (stepNumber, item) => async dispatch => {
+  dispatch({ type: 'CLICK_SQUARE_HIS', stepNumber, item });
+};
+
+const playComputer = () => async dispatch => {
+  dispatch({ type: 'PLAY_COMPUTER' });
+  dispatch({ type: 'RESET_HIS' });
+  dispatch({ type: 'RESET_IS_STATE' });
+};
+
+const playOnline = () => async dispatch => {
+  dispatch({ type: 'PLAY_ONLINE' });
+  dispatch({ type: 'RESET_HIS' });
+  dispatch({ type: 'RESET_IS_STATE' });
+};
+
+const exit = () => async dispatch => {
+  dispatch({ type: 'EXIT' });
+};
 
 const signOut = () => async dispatch => {
   const rs = await apiCaller.signOut();
   if (!isNull(rs)) {
     dispatch({ type: Types.SIGN_OUT });
+    dispatch({ type: 'EXIT' });
   }
 };
 
-function resetHis() {
-  return { type: 'RESET_HIS' };
-}
-
-function emitLogin() {
-  return { type: Types.SIGN_IN, payload: true };
+function emitLogin(username) {
+  return { type: Types.SIGN_IN, payload: username };
 }
 
 const signIn = (username, password) => async dispatch => {
@@ -176,12 +193,22 @@ const signIn = (username, password) => async dispatch => {
   if (!isNull(rs)) {
     const { token } = rs;
     window.localStorage.setItem('token', token);
-    dispatch(emitLogin());
+    dispatch(emitLogin(username));
+  }
+};
+
+const signInFB = () => async dispatch => {
+  const rs = await apiCaller.signInFB();
+  console.log(rs);
+  if (!isNull(rs)) {
+    const { name } = rs;
+    console.log(`name: ${name}`);
+    dispatch(emitLogin(name));
   }
 };
 
 function emitSignUp() {
-  return { type: Types.SIGN_UP, payload: false };
+  return { type: Types.SIGN_UP };
 }
 
 const signUp = (name, username, password) => async dispatch => {
@@ -191,21 +218,28 @@ const signUp = (name, username, password) => async dispatch => {
   }
 };
 
+function emitGetUser(data) {
+  return { type: Types.GET_USER, payload: data.username };
+}
+
 const getUser = () => async dispatch => {
   const rs = await apiCaller.getUser();
   if (!isNull(rs)) {
-    dispatch({ type: Types.GET_USER });
+    dispatch(emitGetUser(rs));
   }
-  console.log(rs);
   return rs;
 };
 
-const checkLogin = () => async dispatch => {
-  const rs = await apiCaller.checkLogin();
+const updateUserLocal = (id, name, username) => async dispatch => {
+  const rs = await apiCaller.updateLocal(id, name, username);
+  // console.log(rs);
   if (!isNull(rs)) {
-    dispatch({ type: Types.GET_USER });
+    dispatch(emitLogin(username));
   }
-  return rs;
+};
+
+const upload = (id, data, config) => async () => {
+  await apiCaller.upload(id, data, config);
 };
 
 const action = {
@@ -220,7 +254,12 @@ const action = {
   signOut,
   signUp,
   getUser,
-  checkLogin
+  signInFB,
+  updateUserLocal,
+  playComputer,
+  playOnline,
+  exit,
+  upload
 };
 
 export default action;

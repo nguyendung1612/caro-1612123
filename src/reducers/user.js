@@ -1,19 +1,20 @@
 import Types from '../constants/ActionTypes';
 
 const STATE_LOGIN = {
-  isLogin: false
+  isLogin: false,
+  username: ''
 };
 
 const userReducer = (state = STATE_LOGIN, action) => {
   switch (action.type) {
     case Types.SIGN_IN:
-      return { ...state, isLogin: action.payload };
+      return { ...state, isLogin: true, username: action.payload };
     case Types.SIGN_OUT:
-      return { ...state, isLogin: false };
+      return { ...state, isLogin: false, username: '' };
     case Types.SIGN_UP:
-      return { ...state, isLogin: action.payload };
+      return { ...state };
     case Types.GET_USER:
-      return { ...state, isLogin: true };
+      return { ...state, isLogin: true, username: action.payload };
     default:
       return { ...state };
   }

@@ -4,7 +4,7 @@ const defaultHis = [
       .fill(null)
       .map(() => Array(20).fill(null)),
     location: '',
-    isWin: null,
+    isWin: false,
     id: 0
   }
 ];
